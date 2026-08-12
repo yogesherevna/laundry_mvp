@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.laundry.software',
-  appName: 'Laundry Software',
+  appId: 'com.washora.software',
+  appName: 'Washora',
   webDir: 'dist',
   server: {
     androidScheme: 'https'

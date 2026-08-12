@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Laundry Software</string>
-    <string name="title_activity_main">Laundry Software</string>
-    <string name="package_name">com.laundry.software</string>
-    <string name="custom_url_scheme">com.laundry.software</string>
+    <string name="app_name">Washora</string>
+    <string name="title_activity_main">Washora</string>
+    <string name="package_name">com.washora.software</string>
+    <string name="custom_url_scheme">com.washora.software</string>
 </resources>
