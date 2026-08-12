@@ -1,0 +1,33 @@
+{
+  "name": "laundry-ionic-react-sqlite",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/copy-sql-wasm.mjs",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "cap:sync": "npm run build && npx cap sync",
+    "android": "npm run build && npx cap sync android && npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.0",
+    "@capacitor/core": "^8.4.2",
+    "@ionic/react": "^8.7.0",
+    "ionicons": "^7.4.0",
+    "jeep-sqlite": "^2.8.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sql.js": "^1.13.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.2"
+  }
+}
