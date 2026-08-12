@@ -32,19 +32,247 @@ import {
     initDatabase 
 } from './db/database';
 
-const nav: any[] = [
-    ['dashboard', 'मुख्य पान', homeOutline],
-    ['newOrder', 'नवीन ऑर्डर', addCircleOutline],
-    ['deliverSearch', 'कपडे द्या', carOutline],
-    ['pending', 'बाकी ऑर्डर्स', listOutline],
-    ['customers', 'ग्राहक', peopleOutline],
-    ['reports', 'रिपोर्ट', barChartOutline],
-    ['collections', 'आजचा हिशोब', cashOutline],
-    ['settings', 'सेटिंग्ज', settingsOutline]
+const nav: Array<[Screen, TranslationKey, any]> = [
+    ['dashboard', 'dashboard', homeOutline],
+    ['newOrder', 'newOrder', addCircleOutline],
+    ['deliverSearch', 'deliver', carOutline],
+    ['pending', 'pending', listOutline],
+    ['customers', 'customers', peopleOutline],
+    ['reports', 'reports', barChartOutline],
+    ['collections', 'collections', cashOutline],
+    ['settings', 'settings', settingsOutline]
 ];
 
 const money = (n: number) =>
     `₹ ${Number(n || 0).toLocaleString('en-IN')}`;
+
+// =========================================================
+// LANGUAGE SUPPORT — UI text only.
+// Does not affect SQLite, orders, payments, reports, or data.
+// =========================================================
+type Language = 'en' | 'mr';
+
+const LANGUAGE_KEY = 'washora_language';
+
+const translations = {
+    en: {
+        dashboard: 'Dashboard',
+        newOrder: 'New Order',
+        deliver: 'Deliver Clothes',
+        pending: 'Pending Orders',
+        customers: 'Customers',
+        reports: 'Reports',
+        collections: "Today's Collection",
+        settings: 'Settings',
+        sqliteSaved: 'डेटा SQLite मध्ये जतन होतो',
+        language: 'Language',
+        english: 'English',
+        marathi: 'मराठी',
+        clothingRates: 'Clothing Rates',
+        shopInformation: 'Shop Information',
+        shopName: 'Shop Name',
+        mobileNumber: 'Mobile Number',
+        address: 'Address',
+        saveChanges: 'Save Changes',
+        changesSaved: 'Changes saved.',
+        todayOrders: "Today's Orders",
+        todayCollected: "Collected Today",
+        clothesPending: 'Clothes Pending',
+        moneyPending: 'Money Pending',
+        quickActions: 'Quick Actions',
+        totalOrders: 'Total Orders',
+        totalAmount: 'Total Amount',
+        paid: 'Paid',
+        balance: 'Balance',
+        cloth: 'Cloth',
+        totalQuantity: 'Total Quantity',
+        amount: 'Amount',
+        cash: 'Cash',
+        upi: 'UPI',
+        card: 'Card',
+        totalCollection: 'Total Collection',
+        todayAccount: "Today's Account",
+        paymentData: 'All collection transactions come from the SQLite payments table.',
+        marathiLanguage: 'मराठी',
+        englishLanguage: 'English',
+        selectLanguage: 'Select Language',
+        back: 'Back',
+        save: 'Save',
+        print: 'Print',
+        customer: 'Customer',
+        search: 'Search',
+        noData: 'No data available',
+    },
+    mr: {
+        dashboard: 'मुख्य पान',
+        newOrder: 'नवीन ऑर्डर',
+        deliver: 'कपडे द्या',
+        pending: 'बाकी ऑर्डर्स',
+        customers: 'ग्राहक',
+        reports: 'रिपोर्ट',
+        collections: 'आजचा हिशोब',
+        settings: 'सेटिंग्ज',
+        sqliteSaved: 'Data is saved in SQLite',
+        language: 'भाषा',
+        english: 'English',
+        marathi: 'मराठी',
+        clothingRates: 'कपड्यांचे दर',
+        shopInformation: 'दुकानाची माहिती',
+        shopName: 'दुकानाचे नाव',
+        mobileNumber: 'मोबाईल नंबर',
+        address: 'पत्ता',
+        saveChanges: 'बदल जतन करा',
+        changesSaved: 'बदल जतन झाले.',
+        todayOrders: 'आजच्या ऑर्डर्स',
+        todayCollected: 'आज जमा',
+        clothesPending: 'कपडे बाकी',
+        moneyPending: 'पैसे बाकी',
+        quickActions: 'जलद कृती',
+        totalOrders: 'एकूण ऑर्डर्स',
+        totalAmount: 'एकूण रक्कम',
+        paid: 'जमा',
+        balance: 'बाकी',
+        cloth: 'कपडा',
+        totalQuantity: 'एकूण संख्या',
+        amount: 'रक्कम',
+        cash: 'रोख',
+        upi: 'UPI',
+        card: 'कार्ड',
+        totalCollection: 'एकूण जमा',
+        todayAccount: 'आजचा हिशोब',
+        paymentData: 'सर्व जमा व्यवहार SQLite मधील payments टेबलमधून येतात.',
+        marathiLanguage: 'मराठी',
+        englishLanguage: 'English',
+        selectLanguage: 'भाषा निवडा',
+        back: 'मागे',
+        save: 'जतन करा',
+        print: 'प्रिंट',
+        customer: 'ग्राहक',
+        search: 'शोधा',
+        noData: 'माहिती उपलब्ध नाही',
+    }
+} as const;
+
+type TranslationKey = keyof typeof translations.en;
+
+const extraTranslations: Record<string, { en: string; mr: string }> = {
+    "ग्राहकाची माहिती": { en: "Customer Information", mr: "ग्राहकाची माहिती" },
+    "मोबाईल नंबर": { en: "Mobile Number", mr: "मोबाईल नंबर" },
+    "नाव": { en: "Name", mr: "नाव" },
+    "एकूण": { en: "Total", mr: "एकूण" },
+    "आत्ता घेतले": { en: "Paid Now", mr: "आत्ता घेतले" },
+    "कपडे": { en: "Clothes", mr: "कपडे" },
+    "दर": { en: "Rate", mr: "दर" },
+    "संख्या": { en: "Quantity", mr: "संख्या" },
+    "लॉन्ड्री पावती": { en: "Laundry Receipt", mr: "लॉन्ड्री पावती" },
+    "धन्यवाद!": { en: "Thank you!", mr: "धन्यवाद!" },
+    "ऑर्डर शोधा": { en: "Search Order", mr: "ऑर्डर शोधा" },
+    "आज": { en: "Today", mr: "आज" },
+    "उद्या": { en: "Tomorrow", mr: "उद्या" },
+    "ऑर्डर": { en: "Order", mr: "ऑर्डर" },
+    "मोबाईल": { en: "Mobile", mr: "मोबाईल" },
+    "देण्याची तारीख": { en: "Delivery Date", mr: "देण्याची तारीख" },
+    "स्थिती": { en: "Status", mr: "स्थिती" },
+    "ऑर्डरची माहिती": { en: "Order Information", mr: "ऑर्डरची माहिती" },
+    "पैसे घेणे": { en: "Collect Payment", mr: "पैसे घेणे" },
+    "आधी घेतले": { en: "Already Paid", mr: "आधी घेतले" },
+    "तारीख": { en: "Date", mr: "तारीख" },
+    "मराठी": { en: "Marathi", mr: "मराठी" },
+    "मुख्य पान": { en: "Dashboard", mr: "मुख्य पान" },
+    "नवीन ऑर्डर": { en: "New Order", mr: "नवीन ऑर्डर" },
+    "कपडे द्या": { en: "Deliver Clothes", mr: "कपडे द्या" },
+    "बाकी ऑर्डर्स": { en: "Pending Orders", mr: "बाकी ऑर्डर्स" },
+    "ग्राहक": { en: "Customers", mr: "ग्राहक" },
+    "रिपोर्ट": { en: "Reports", mr: "रिपोर्ट" },
+    "आजचा हिशोब": { en: "Today's Collection", mr: "आजचा हिशोब" },
+    "सेटिंग्ज": { en: "Settings", mr: "सेटिंग्ज" },
+    "भाषा": { en: "Language", mr: "भाषा" },
+    "कपड्यांचे दर": { en: "Clothing Rates", mr: "कपड्यांचे दर" },
+    "दुकानाची माहिती": { en: "Shop Information", mr: "दुकानाची माहिती" },
+    "दुकानाचे नाव": { en: "Shop Name", mr: "दुकानाचे नाव" },
+    "पत्ता": { en: "Address", mr: "पत्ता" },
+    "बदल जतन करा": { en: "Save Changes", mr: "बदल जतन करा" },
+    "बदल जतन झाले.": { en: "Changes saved.", mr: "बदल जतन झाले." },
+    "आजच्या ऑर्डर्स": { en: "Today's Orders", mr: "आजच्या ऑर्डर्स" },
+    "आज जमा": { en: "Collected Today", mr: "आज जमा" },
+    "कपडे बाकी": { en: "Clothes Pending", mr: "कपडे बाकी" },
+    "पैसे बाकी": { en: "Money Pending", mr: "पैसे बाकी" },
+    "जलद कृती": { en: "Quick Actions", mr: "जलद कृती" },
+    "एकूण ऑर्डर्स": { en: "Total Orders", mr: "एकूण ऑर्डर्स" },
+    "एकूण रक्कम": { en: "Total Amount", mr: "एकूण रक्कम" },
+    "जमा": { en: "Paid", mr: "जमा" },
+    "बाकी": { en: "Balance", mr: "बाकी" },
+    "कपडा": { en: "Cloth", mr: "कपडा" },
+    "एकूण संख्या": { en: "Total Quantity", mr: "एकूण संख्या" },
+    "रक्कम": { en: "Amount", mr: "रक्कम" },
+    "रोख": { en: "Cash", mr: "रोख" },
+    "कार्ड": { en: "Card", mr: "कार्ड" },
+    "एकूण जमा": { en: "Total Collection", mr: "एकूण जमा" },
+    "सर्व जमा व्यवहार SQLite मधील payments टेबलमधून येतात.": { en: "All collection transactions come from the SQLite payments table.", mr: "सर्व जमा व्यवहार SQLite मधील payments टेबलमधून येतात." },
+    "भाषा निवडा": { en: "Select Language", mr: "भाषा निवडा" },
+    "मागे": { en: "Back", mr: "मागे" },
+    "जतन करा": { en: "Save", mr: "जतन करा" },
+    "प्रिंट": { en: "Print", mr: "प्रिंट" },
+    "शोधा": { en: "Search", mr: "शोधा" },
+    "माहिती उपलब्ध नाही": { en: "No data available", mr: "माहिती उपलब्ध नाही" },
+    "मेनू": { en: "Menu", mr: "मेनू" },
+    "लॉन्ड्री सॉफ्टवेअर": { en: "Laundry Software", mr: "लॉन्ड्री सॉफ्टवेअर" },
+    "मोबाईल, नाव आणि किमान एक कपडा भरा.": { en: "Enter mobile, name and at least one cloth.", mr: "मोबाईल, नाव आणि किमान एक कपडा भरा." },
+    "ग्राहकाचे नाव": { en: "Customer Name", mr: "ग्राहकाचे नाव" },
+    "मोबाईल / ऑर्डर नंबर / नाव": { en: "Mobile / Order Number / Name", mr: "मोबाईल / ऑर्डर नंबर / नाव" },
+    "उघडा": { en: "Open", mr: "उघडा" },
+    "नाव, मोबाईल किंवा ऑर्डर नंबर": { en: "Name, mobile or order number", mr: "नाव, मोबाईल किंवा ऑर्डर नंबर" },
+    "तयार": { en: "Ready", mr: "तयार" },
+    "दिलेली": { en: "Delivered", mr: "दिलेली" },
+    "ग्राहकाचे नाव / मोबाईल": { en: "Customer Name / Mobile", mr: "ग्राहकाचे नाव / मोबाईल" },
+    "ऑर्डर्स": { en: "Orders", mr: "ऑर्डर्स" },
+    "एकूण खर्च": { en: "Total Cost", mr: "एकूण खर्च" },
+    "माझी लॉन्ड्री": { en: "My Laundry", mr: "माझी लॉन्ड्री" },
+    "पुणे, महाराष्ट्र": { en: "Pune, Maharashtra", mr: "पुणे, महाराष्ट्र" },
+    "डेटाबेस सुरू होत आहे...": { en: "Starting database...", mr: "डेटाबेस सुरू होत आहे..." },
+    "कपडे देण्याची तारीख": { en: "Clothes Delivery Date", mr: "कपडे देण्याची तारीख" },
+    "पैशांची माहिती": { en: "Payment Information", mr: "पैशांची माहिती" },
+    "पैसे कसे घेतले?": { en: "Payment Method?", mr: "पैसे कसे घेतले?" },
+    "रद्द करा": { en: "Cancel", mr: "रद्द करा" },
+    "सेव्ह करा आणि पावती काढा": { en: "Save & Print Receipt", mr: "सेव्ह करा आणि पावती काढा" },
+    "ऑर्डर नं.": { en: "Order No.", mr: "ऑर्डर नं." },
+    "पैसे": { en: "Payment", mr: "पैसे" },
+    "एकूण :": { en: "Total:", mr: "एकूण :" },
+    "जमा :": { en: "Paid:", mr: "जमा :" },
+    "बाकी :": { en: "Balance:", mr: "बाकी :" },
+    "पावती प्रिंट करा": { en: "Print Receipt", mr: "पावती प्रिंट करा" },
+    "सर्व": { en: "All", mr: "सर्व" },
+    "सर्व ({rows.length})": { en: "All ({rows.length})", mr: "सर्व ({rows.length})" },
+    "उशीर झालेले": { en: "Delayed", mr: "उशीर झालेले" },
+    "आता किती पैसे घेतले?": { en: "How much payment received now?", mr: "आता किती पैसे घेतले?" },
+    "कपडे दिले": { en: "Clothes Delivered", mr: "कपडे दिले" },
+    "मागील ऑर्डर्स": { en: "Previous Orders", mr: "मागील ऑर्डर्स" },
+    "कपड्यांचा हिशोब": { en: "Clothing Report", mr: "कपड्यांचा हिशोब" },
+    "पत्ता:": { en: "Address:", mr: "पत्ता:" },
+    "ऑर्डर नं. :": { en: "Order No. :", mr: "ऑर्डर नं. :" },
+    "ग्राहक :": { en: "Customer :", mr: "ग्राहक :" },
+    "मोबाईल :": { en: "Mobile :", mr: "मोबाईल :" },
+    "नाव :": { en: "Name :", mr: "नाव :" },
+    "सर्व जमा व्यवहार SQLite": { en: "All collection transactions from SQLite", mr: "सर्व जमा व्यवहार SQLite" },
+    "मधील <b>payments</b> टेबलमधून": { en: "from the payments table", mr: "मधील <b>payments</b> टेबलमधून" },
+    "येतात.": { en: "are shown here.", mr: "येतात." },
+    "पत्ता :": { en: "Address :", mr: "पत्ता :" },
+};
+
+let activeLanguage: Language = 'en';
+
+function getInitialLanguage(): Language {
+    const saved = localStorage.getItem(LANGUAGE_KEY);
+    return saved === 'mr' ? 'mr' : 'en';
+}
+
+function t(key: string): string {
+    const language = activeLanguage;
+    if (key in extraTranslations) return extraTranslations[key][language];
+    const table = translations[language] as Record<string, string>;
+    return table[key] ?? key;
+}
+
 
 export default function App() {
     const [screen, setScreen] = useState<Screen>('dashboard');
@@ -56,6 +284,16 @@ export default function App() {
 
     // NEW: mobile sidebar state
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [language, setLanguage] = useState<Language>(getInitialLanguage);
+
+    const changeLanguage = (nextLanguage: Language) => {
+        localStorage.setItem(LANGUAGE_KEY, nextLanguage);
+        setLanguage(nextLanguage);
+    };
+
+    // Keep the current UI language available to all existing screens without
+    // changing their business logic or data flow.
+    activeLanguage = language;
 
     const refresh = async () => {
         const [orderData, statsData, customerData] = await Promise.all([
@@ -110,7 +348,7 @@ export default function App() {
                 color: '#000'
                 }}
             >
-                डेटाबेस सुरू होत आहे...
+                {t('डेटाबेस सुरू होत आहे...')}
             </div>
             </IonApp>
         );
@@ -134,7 +372,7 @@ export default function App() {
                         }`}
                 >
                     <div className="brand">
-                        लॉन्ड्री सॉफ्टवेअर
+                        {t('लॉन्ड्री सॉफ्टवेअर')}
                     </div>
 
                     <nav>
@@ -145,13 +383,13 @@ export default function App() {
                                 onClick={() => go(id)}
                             >
                                 <IonIcon icon={icon} />
-                                <span>{label}</span>
+                                <span>{t(label as string)}</span>
                             </button>
                         ))}
                     </nav>
 
                     <div className="sidebar-foot">
-                        डेटा SQLite मध्ये जतन होतो
+                        {t('sqliteSaved')}
                     </div>
                 </aside>
 
@@ -166,15 +404,16 @@ export default function App() {
                             onClick={() =>
                                 setSidebarOpen(value => !value)
                             }
-                            aria-label="मेनू"
+                            aria-label={t("मेनू")}
                         >
                             ☰
                         </button>
 
                         <strong>
-                            {nav.find(
-                                n => n[0] === screen
-                            )?.[1] || 'लॉन्ड्री सॉफ्टवेअर'}
+                            {t(
+                                nav.find(n => n[0] === screen)?.[1] ||
+                                'लॉन्ड्री सॉफ्टवेअर'
+                            )}
                         </strong>
 
                     </header>
@@ -296,15 +535,15 @@ export default function App() {
                             )}
 
                         {screen === 'reports' && (
-                            <Reports />
+                            <Reports language={language}/>
                         )}
 
                         {screen === 'collections' && (
-                            <Collections />
+                            <Collections language={language}/>
                         )}
 
                         {screen === 'settings' && (
-                            <Settings />
+                            <Settings language={language} onLanguageChange={changeLanguage} />
                         )}
 
                     </div>
@@ -332,22 +571,22 @@ function Dashboard({
             <div className="stats">
 
                 <Stat
-                    title="आजच्या ऑर्डर्स"
+                    title={t("आजच्या ऑर्डर्स")}
                     value={stats.todayOrders || 0}
                 />
 
                 <Stat
-                    title="आज जमा"
+                    title={t("आज जमा")}
                     value={money(stats.todayCollection)}
                 />
 
                 <Stat
-                    title="कपडे बाकी"
+                    title={t("कपडे बाकी")}
                     value={stats.pendingDelivery || 0}
                 />
 
                 <Stat
-                    title="पैसे बाकी"
+                    title={t("पैसे बाकी")}
                     value={money(stats.balanceAmount)}
                 />
 
@@ -357,37 +596,37 @@ function Dashboard({
 
                 <Quick
                     icon={addCircleOutline}
-                    text="नवीन ऑर्डर"
+                    text={t("नवीन ऑर्डर")}
                     on={() => on('newOrder')}
                 />
 
                 <Quick
                     icon={carOutline}
-                    text="कपडे द्या"
+                    text={t("कपडे द्या")}
                     on={() => on('deliverSearch')}
                 />
 
                 <Quick
                     icon={listOutline}
-                    text="बाकी ऑर्डर्स"
+                    text={t("बाकी ऑर्डर्स")}
                     on={() => on('pending')}
                 />
 
                 <Quick
                     icon={cashOutline}
-                    text="आजचा हिशोब"
+                    text={t("आजचा हिशोब")}
                     on={() => on('collections')}
                 />
 
                 <Quick
                     icon={peopleOutline}
-                    text="ग्राहक"
+                    text={t("ग्राहक")}
                     on={() => on('customers')}
                 />
 
                 <Quick
                     icon={barChartOutline}
-                    text="रिपोर्ट"
+                    text={t("रिपोर्ट")}
                     on={() => on('reports')}
                 />
 
@@ -529,7 +768,7 @@ function NewOrder({
             !selected.length
         ) {
             alert(
-                'मोबाईल, नाव आणि किमान एक कपडा भरा.'
+                t('मोबाईल, नाव आणि किमान एक कपडा भरा.')
             );
             return;
         }
@@ -552,40 +791,40 @@ function NewOrder({
 
                 <section className="card">
 
-                    <h2>ग्राहकाची माहिती</h2>
+                    <h2>{t('ग्राहकाची माहिती')}</h2>
 
-                    <label>मोबाईल नंबर *</label>
+                    <label>{t('मोबाईल नंबर')} *</label>
 
                     <input
                         value={mobile}
                         onChange={e =>
                             setMobile(e.target.value)
                         }
-                        placeholder="मोबाईल नंबर"
+                        placeholder={t("मोबाईल नंबर")}
                     />
 
-                    <label>नाव *</label>
+                    <label>{t('नाव')} *</label>
 
                     <input
                         value={name}
                         onChange={e =>
                             setName(e.target.value)
                         }
-                        placeholder="ग्राहकाचे नाव"
+                        placeholder={t("ग्राहकाचे नाव")}
                     />
 
-                    <label>पत्ता</label>
+                    <label>{t('address')}</label>
 
                     <textarea
                         value={address}
                         onChange={e =>
                             setAddress(e.target.value)
                         }
-                        placeholder="पत्ता"
+                        placeholder={t("पत्ता")}
                     />
 
                     <label>
-                        कपडे देण्याची तारीख *
+                        {t('कपडे देण्याची तारीख')} *
                     </label>
 
                     <input
@@ -596,18 +835,18 @@ function NewOrder({
                     />
 
                     <h2 className="section-gap">
-                        पैशांची माहिती
+                        {t('पैशांची माहिती')}
                     </h2>
 
                     <div className="money-box">
 
                         <div>
-                            <span>एकूण</span>
+                            <span>{t('एकूण')}</span>
                             <b>{money(total)}</b>
                         </div>
 
                         <div>
-                            <span>आत्ता घेतले</span>
+                            <span>{t('आत्ता घेतले')}</span>
 
                             <input
                                 type="number"
@@ -626,14 +865,14 @@ function NewOrder({
                         </div>
 
                         <div>
-                            <span>बाकी</span>
+                            <span>{t('बाकी')}</span>
                             <b>{money(balance)}</b>
                         </div>
 
                     </div>
 
                     <label>
-                        पैसे कसे घेतले?
+                        {t('पैसे कसे घेतले?')}
                     </label>
 
                     <select
@@ -643,13 +882,13 @@ function NewOrder({
                         }
                     >
                         <option value="CASH">
-                            रोख
+                            {t('रोख')}
                         </option>
                         <option value="UPI">
                             UPI
                         </option>
                         <option value="CARD">
-                            कार्ड
+                            {t('कार्ड')}
                         </option>
                     </select>
 
@@ -658,15 +897,15 @@ function NewOrder({
 
                 <section className="card">
 
-                    <h2>कपडे</h2>
+                    <h2>{t('कपडे')}</h2>
 
                     <div className="item-table">
 
                         <div className="thead">
-                            <span>कपडा</span>
-                            <span>दर</span>
-                            <span>संख्या</span>
-                            <span>रक्कम</span>
+                            <span>{t('कपडा')}</span>
+                            <span>{t('दर')}</span>
+                            <span>{t('संख्या')}</span>
+                            <span>{t('रक्कम')}</span>
                         </div>
 
                         {items.map((i, n) => (
@@ -727,7 +966,7 @@ function NewOrder({
                     className="secondary"
                     onClick={onBack}
                 >
-                    रद्द करा
+                    {t('रद्द करा')}
                 </button>
 
                 <button
@@ -738,7 +977,7 @@ function NewOrder({
                         icon={printOutline}
                     />
 
-                    सेव्ह करा आणि पावती काढा
+                    {t('सेव्ह करा आणि पावती काढा')}
                 </button>
 
             </div>
@@ -764,41 +1003,41 @@ function Receipt({
 
             <div className="receipt card">
 
-                <h1>लॉन्ड्री पावती</h1>
+                <h1>{t('लॉन्ड्री पावती')}</h1>
 
                 <hr />
 
                 <div className="receipt-meta">
 
                     <div>
-                        ऑर्डर नं.:
+                        {t('ऑर्डर नं.')} :
                         <b>{order.id}</b>
                         <br />
 
-                        तारीख:
+                        {t('तारीख')}:
                         {order.orderDate}
                         <br />
 
-                        ग्राहक:
+                        {t('ग्राहक')}:
                         {order.customerName}
                         <br />
 
-                        मोबाईल:
+                        {t('मोबाईल')}:
                         {order.mobile}
                         <br />
 
-                        पत्ता:
+                        {t('पत्ता:')}
                         {order.address || '-'}
                     </div>
 
                     <div>
-                        कपडे देण्याची तारीख:
+                        {t('कपडे देण्याची तारीख')}:
                         {order.deliveryDate}
                         <br />
 
-                        पैसे:
+                        {t('पैसे')}:
                         {order.paymentMode === 'CASH'
-                            ? 'रोख'
+                            ? t('रोख')
                             : order.paymentMode}
                     </div>
 
@@ -809,10 +1048,10 @@ function Receipt({
 
                     <thead>
                         <tr>
-                            <th>कपडा</th>
-                            <th>संख्या</th>
-                            <th>दर</th>
-                            <th>रक्कम</th>
+                            <th>{t('कपडा')}</th>
+                            <th>{t('संख्या')}</th>
+                            <th>{t('दर')}</th>
+                            <th>{t('रक्कम')}</th>
                         </tr>
                     </thead>
 
@@ -839,23 +1078,23 @@ function Receipt({
                 <div className="receipt-total">
 
                     <div>
-                        एकूण :
+                        {t('एकूण :')}
                         {money(order.total)}
                     </div>
 
                     <div>
-                        जमा :
+                        {t('जमा :')}
                         {money(order.paid)}
                     </div>
 
                     <b>
-                        बाकी :
+                        {t('बाकी') + ' :'}
                         {money(order.balance)}
                     </b>
 
                 </div>
 
-                <h3>धन्यवाद!</h3>
+                <h3>{t('धन्यवाद!')}</h3>
 
             </div>
 
@@ -866,7 +1105,7 @@ function Receipt({
                     className="secondary"
                     onClick={onBack}
                 >
-                    मागे
+                    {t('मागे')}
                 </button>
 
                 <button
@@ -879,7 +1118,7 @@ function Receipt({
                         icon={printOutline}
                     />
 
-                    पावती प्रिंट करा
+                    {t('पावती प्रिंट करा')}
                 </button>
 
             </div>
@@ -916,7 +1155,7 @@ function DeliverSearch({
 
             <div className="card">
 
-                <h2>ऑर्डर शोधा</h2>
+                <h2>{t('ऑर्डर शोधा')}</h2>
 
                 <div className="search-input">
 
@@ -925,7 +1164,7 @@ function DeliverSearch({
                         onChange={e =>
                             setQ(e.target.value)
                         }
-                        placeholder="मोबाईल / ऑर्डर नंबर / नाव"
+                        placeholder={t("मोबाईल / ऑर्डर नंबर / नाव")}
                     />
 
                     <button>
@@ -940,7 +1179,7 @@ function DeliverSearch({
 
             <OrderTable
                 orders={rows}
-                action="उघडा"
+                action={t("उघडा")}
                 onAction={onOpen}
             />
 
@@ -977,13 +1216,13 @@ function Pending({
             <div className="filter-row">
 
                 <button className="selected">
-                    सर्व ({rows.length})
+                    {t('सर्व ({rows.length})')}
                 </button>
 
-                <button>आज</button>
-                <button>उद्या</button>
+                <button>{t('आज')}</button>
+                <button>{t('उद्या')}</button>
                 <button>
-                    उशीर झालेले
+                    {t('उशीर झालेले')}
                 </button>
 
                 <input
@@ -991,14 +1230,14 @@ function Pending({
                     onChange={e =>
                         setQ(e.target.value)
                     }
-                    placeholder="नाव, मोबाईल किंवा ऑर्डर नंबर"
+                    placeholder={t("नाव, मोबाईल किंवा ऑर्डर नंबर")}
                 />
 
             </div>
 
             <OrderTable
                 orders={rows}
-                action="कपडे द्या"
+                action={t("कपडे द्या")}
                 onAction={onDeliver}
             />
 
@@ -1027,14 +1266,14 @@ function OrderTable({
 
                 <thead>
                     <tr>
-                        <th>ऑर्डर</th>
-                        <th>ग्राहक</th>
-                        <th>मोबाईल</th>
-                        <th>देण्याची तारीख</th>
-                        <th>एकूण</th>
-                        <th>जमा</th>
-                        <th>बाकी</th>
-                        <th>स्थिती</th>
+                        <th>{t('ऑर्डर')}</th>
+                        <th>{t('ग्राहक')}</th>
+                        <th>{t('मोबाईल')}</th>
+                        <th>{t('देण्याची तारीख')}</th>
+                        <th>{t('एकूण')}</th>
+                        <th>{t('जमा')}</th>
+                        <th>{t('बाकी')}</th>
+                        <th>{t('स्थिती')}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -1077,8 +1316,8 @@ function OrderTable({
                             <td>
                                 <span className="badge">
                                     {o.status === 'READY'
-                                        ? 'तयार'
-                                        : 'दिलेली'}
+                                        ? t('तयार')
+                                        : t('दिलेली')}
                                 </span>
                             </td>
 
@@ -1135,25 +1374,25 @@ function Delivery({
 
                 <section className="card">
 
-                    <h2>ऑर्डरची माहिती</h2>
+                    <h2>{t('ऑर्डरची माहिती')}</h2>
 
                     <p>
-                        ऑर्डर नं. : {order.id}
+                        {t('ऑर्डर नं. :')} {order.id}
                     </p>
 
                     <p>
-                        ग्राहक :
+                        {t('ग्राहक :')}
                         <b>
                             {order.customerName}
                         </b>
                     </p>
 
                     <p>
-                        मोबाईल : {order.mobile}
+                        {t('मोबाईल :')} {order.mobile}
                     </p>
 
                     <p>
-                        देण्याची तारीख :
+                        {t('देण्याची तारीख')} :
                         {order.deliveryDate}
                     </p>
 
@@ -1161,9 +1400,9 @@ function Delivery({
 
                         <thead>
                             <tr>
-                                <th>कपडा</th>
-                                <th>संख्या</th>
-                                <th>रक्कम</th>
+                                <th>{t('कपडा')}</th>
+                                <th>{t('संख्या')}</th>
+                                <th>{t('रक्कम')}</th>
                             </tr>
                         </thead>
 
@@ -1188,26 +1427,26 @@ function Delivery({
 
                 <section className="card">
 
-                    <h2>पैसे घेणे</h2>
+                    <h2>{t('पैसे घेणे')}</h2>
 
                     <div className="money-box">
 
                         <div>
-                            <span>एकूण</span>
+                            <span>{t('एकूण')}</span>
                             <b>
                                 {money(order.total)}
                             </b>
                         </div>
 
                         <div>
-                            <span>आधी घेतले</span>
+                            <span>{t('आधी घेतले')}</span>
                             <b>
                                 {money(order.paid)}
                             </b>
                         </div>
 
                         <div>
-                            <span>बाकी</span>
+                            <span>{t('बाकी')}</span>
                             <b className="danger">
                                 {money(order.balance)}
                             </b>
@@ -1216,7 +1455,7 @@ function Delivery({
                     </div>
 
                     <label>
-                        आता किती पैसे घेतले?
+                        {t('आता किती पैसे घेतले?')}
                     </label>
 
                     <input
@@ -1238,7 +1477,7 @@ function Delivery({
                     />
 
                     <label>
-                        पैसे कसे घेतले?
+                        {t('पैसे कसे घेतले?')}
                     </label>
 
                     <select
@@ -1248,7 +1487,7 @@ function Delivery({
                         }
                     >
                         <option value="CASH">
-                            रोख
+                            {t('रोख')}
                         </option>
 
                         <option value="UPI">
@@ -1256,7 +1495,7 @@ function Delivery({
                         </option>
 
                         <option value="CARD">
-                            कार्ड
+                            {t('कार्ड')}
                         </option>
                     </select>
 
@@ -1271,7 +1510,7 @@ function Delivery({
                     className="secondary"
                     onClick={onBack}
                 >
-                    मागे
+                    {t('मागे')}
                 </button>
 
                 <button
@@ -1290,7 +1529,7 @@ function Delivery({
                         }
                     />
 
-                    कपडे दिले
+                    {t('कपडे दिले')}
                 </button>
 
             </div>
@@ -1334,7 +1573,7 @@ function Customers({
                         onChange={e =>
                             setQ(e.target.value)
                         }
-                        placeholder="ग्राहकाचे नाव / मोबाईल"
+                        placeholder={t("ग्राहकाचे नाव / मोबाईल")}
                     />
 
                     <button>
@@ -1361,13 +1600,13 @@ function Customers({
                         <strong>{c.name}</strong>
                         <span>{c.mobile}</span>
                         <span>
-                            {c.orderCount} ऑर्डर्स
+                            {c.orderCount} {t('ऑर्डर्स')}
                         </span>
                         <b>
                             {money(
                                 c.balanceAmount
                             )}{' '}
-                            बाकी
+                            {t('बाकी')}
                         </b>
                     </button>
                 ))}
@@ -1400,23 +1639,23 @@ function CustomerDetail({
                 <section className="card">
 
                     <h2>
-                        ग्राहकाची माहिती
+                        {t('ग्राहकाची माहिती')}
                     </h2>
 
                     <p>
-                        नाव :
+                        {t('नाव :')}
                         <b>
                             {order.customerName}
                         </b>
                     </p>
 
                     <p>
-                        मोबाईल :
+                        {t('मोबाईल :')}
                         {order.mobile}
                     </p>
 
                     <p>
-                        पत्ता :
+                        {t('पत्ता :')}
                         {order.address || '-'}
                     </p>
 
@@ -1425,17 +1664,17 @@ function CustomerDetail({
 
                 <section className="card">
 
-                    <h2>एकूण</h2>
+                    <h2>{t('एकूण')}</h2>
 
                     <div className="stats">
 
                         <Stat
-                            title="ऑर्डर्स"
+                            title={t("ऑर्डर्स")}
                             value={history.length}
                         />
 
                         <Stat
-                            title="एकूण खर्च"
+                            title={t("एकूण खर्च")}
                             value={money(
                                 history.reduce(
                                     (s, o) =>
@@ -1446,7 +1685,7 @@ function CustomerDetail({
                         />
 
                         <Stat
-                            title="जमा"
+                            title={t("जमा")}
                             value={money(
                                 history.reduce(
                                     (s, o) =>
@@ -1457,7 +1696,7 @@ function CustomerDetail({
                         />
 
                         <Stat
-                            title="बाकी"
+                            title={t("बाकी")}
                             value={money(
                                 history.reduce(
                                     (s, o) =>
@@ -1477,20 +1716,20 @@ function CustomerDetail({
             <div className="card table-wrap">
 
                 <h2>
-                    मागील ऑर्डर्स
+                    {t('मागील ऑर्डर्स')}
                 </h2>
 
                 <table>
 
                     <thead>
                         <tr>
-                            <th>ऑर्डर</th>
-                            <th>तारीख</th>
-                            <th>देण्याची तारीख</th>
-                            <th>रक्कम</th>
-                            <th>जमा</th>
-                            <th>बाकी</th>
-                            <th>स्थिती</th>
+                            <th>{t('ऑर्डर')}</th>
+                            <th>{t('तारीख')}</th>
+                            <th>{t('देण्याची तारीख')}</th>
+                            <th>{t('रक्कम')}</th>
+                            <th>{t('जमा')}</th>
+                            <th>{t('बाकी')}</th>
+                            <th>{t('स्थिती')}</th>
                         </tr>
                     </thead>
 
@@ -1529,8 +1768,8 @@ function CustomerDetail({
 
                                 <td>
                                     {o.status === 'READY'
-                                        ? 'तयार'
-                                        : 'दिलेली'}
+                                        ? t('तयार')
+                                        : t('दिलेली')}
                                 </td>
 
                             </tr>
@@ -1547,7 +1786,7 @@ function CustomerDetail({
                 className="secondary"
                 onClick={onBack}
             >
-                मागे
+                {t('मागे')}
             </button>
 
         </div>
@@ -1559,7 +1798,7 @@ function CustomerDetail({
    REPORTS
    ========================================================= */
 
-function Reports() {
+function Reports({language}:{language:Language}) {
     const [item, setItem] =
         useState<any[]>([]);
 
@@ -1582,28 +1821,28 @@ function Reports() {
             <div className="stats">
 
                 <Stat
-                    title="एकूण ऑर्डर्स"
+                    title={t("एकूण ऑर्डर्स")}
                     value={
                         stats.totalOrders || 0
                     }
                 />
 
                 <Stat
-                    title="एकूण रक्कम"
+                    title={t("एकूण रक्कम")}
                     value={money(
                         stats.totalAmount
                     )}
                 />
 
                 <Stat
-                    title="जमा"
+                    title={t("जमा")}
                     value={money(
                         stats.paidAmount
                     )}
                 />
 
                 <Stat
-                    title="बाकी"
+                    title={t("बाकी")}
                     value={money(
                         stats.balanceAmount
                     )}
@@ -1615,16 +1854,16 @@ function Reports() {
             <div className="card table-wrap">
 
                 <h2>
-                    कपड्यांचा हिशोब
+                    {t('कपड्यांचा हिशोब')}
                 </h2>
 
                 <table>
 
                     <thead>
                         <tr>
-                            <th>कपडा</th>
-                            <th>एकूण संख्या</th>
-                            <th>रक्कम</th>
+                            <th>{t('कपडा')}</th>
+                            <th>{t('एकूण संख्या')}</th>
+                            <th>{t('रक्कम')}</th>
                         </tr>
                     </thead>
 
@@ -1655,7 +1894,7 @@ function Reports() {
    COLLECTIONS
    ========================================================= */
 
-function Collections() {
+function Collections({language}:{language:Language}) {
     const [p, setP] =
         useState<any[]>([]);
 
@@ -1686,7 +1925,7 @@ function Collections() {
             <div className="stats">
 
                 <Stat
-                    title="रोख"
+                    title={t("रोख")}
                     value={money(cash)}
                 />
 
@@ -1696,12 +1935,12 @@ function Collections() {
                 />
 
                 <Stat
-                    title="कार्ड"
+                    title={t("कार्ड")}
                     value={money(card)}
                 />
 
                 <Stat
-                    title="एकूण जमा"
+                    title={t('एकूण जमा')}
                     value={money(
                         cash + upi + card
                     )}
@@ -1713,13 +1952,13 @@ function Collections() {
             <div className="card">
 
                 <h2>
-                    आजचा हिशोब
+                    {t('आजचा हिशोब')}
                 </h2>
 
                 <p>
-                    सर्व जमा व्यवहार SQLite
-                    मधील <b>payments</b> टेबलमधून
-                    येतात.
+                    {t('सर्व जमा व्यवहार SQLite')}
+                    {t('मधील <b>payments</b> टेबलमधून')}
+                    {t('येतात.')}
                 </p>
 
             </div>
@@ -1733,7 +1972,7 @@ function Collections() {
    SETTINGS
    ========================================================= */
 
-function Settings() {
+function Settings({ language, onLanguageChange }: { language: Language; onLanguageChange: (language: Language) => void }) {
     const [items, setItems] =
         useState<any[]>([]);
 
@@ -1745,11 +1984,23 @@ function Settings() {
 
     return (
         <div className="page">
+            <div className="card">
+                <h2>{t('language')}</h2>
+                <label htmlFor="washora-language">{t('selectLanguage')}</label>
+                <select
+                    id="washora-language"
+                    value={language}
+                    onChange={(e) => onLanguageChange(e.target.value as Language)}
+                >
+                    <option value="en">{t('english')}</option>
+                    <option value="mr">{t('marathi')}</option>
+                </select>
+            </div>
 
             <div className="card">
 
                 <h2>
-                    कपड्यांचे दर
+                    {t('कपड्यांचे दर')}
                 </h2>
 
                 {items.map(i => (
@@ -1796,19 +2047,19 @@ function Settings() {
             <div className="card">
 
                 <h2>
-                    दुकानाची माहिती
+                    {t('दुकानाची माहिती')}
                 </h2>
 
                 <label>
-                    दुकानाचे नाव
+                    {t('दुकानाचे नाव')}
                 </label>
 
                 <input
-                    defaultValue="माझी लॉन्ड्री"
+                    defaultValue={t("माझी लॉन्ड्री")}
                 />
 
                 <label>
-                    मोबाईल नंबर
+                    {t('मोबाईल नंबर')}
                 </label>
 
                 <input
@@ -1816,11 +2067,11 @@ function Settings() {
                 />
 
                 <label>
-                    पत्ता
+                    {t('पत्ता')}
                 </label>
 
                 <textarea
-                    defaultValue="पुणे, महाराष्ट्र"
+                    defaultValue={t("पुणे, महाराष्ट्र")}
                 />
 
                 <button
@@ -1828,19 +2079,19 @@ function Settings() {
                     onClick={() =>
                         updateSettings({
                             businessName:
-                                'माझी लॉन्ड्री',
+                                t('माझी लॉन्ड्री'),
                             mobile:
                                 '9876543210',
                             address:
-                                'पुणे, महाराष्ट्र'
+                                t('पुणे, महाराष्ट्र')
                         }).then(() =>
                             alert(
-                                'बदल जतन झाले.'
+                                t('बदल जतन झाले.')
                             )
                         )
                     }
                 >
-                    बदल जतन करा
+                    {t('बदल जतन करा')}
                 </button>
 
             </div>

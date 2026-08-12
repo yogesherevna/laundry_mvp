@@ -707,3 +707,8 @@ textarea {
     }
 
 }
+
+/* Washora language selector */
+.language-select {
+    max-width: 320px;
+}
