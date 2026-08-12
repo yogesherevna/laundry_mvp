@@ -232,9 +232,9 @@ export async function initDatabase() {
     `SELECT COUNT(*) AS count FROM orders`
   );
 
-  if (Number(orderCount[0]?.count ?? 0) === 0) {
-    await seedDemoData();
-  }
+  // if (Number(orderCount[0]?.count ?? 0) === 0) {
+  //   await seedDemoData();
+  // }
 
   initialized = true;
 }
