@@ -274,6 +274,41 @@ function t(key: string): string {
 }
 
 
+function translateClothingName(name: string, language: Language) {
+    const names: Record<string, { en: string; mr: string }> = {
+        'शर्ट': {
+            en: 'Shirt',
+            mr: 'शर्ट'
+        },
+        'पॅन्ट': {
+            en: 'Pant',
+            mr: 'पॅन्ट'
+        },
+        'टी-शर्ट': {
+            en: 'T-Shirt',
+            mr: 'टी-शर्ट'
+        },
+        'साडी': {
+            en: 'Saree',
+            mr: 'साडी'
+        },
+        'बेडशीट': {
+            en: 'Bedsheet',
+            mr: 'बेडशीट'
+        },
+        'ब्लँकेट': {
+            en: 'Blanket',
+            mr: 'ब्लँकेट'
+        },
+        'इतर': {
+            en: 'Other',
+            mr: 'इतर'
+        }
+    };
+
+    return names[name]?.[language] ?? name;
+}
+
 export default function App() {
     const [screen, setScreen] = useState<Screen>('dashboard');
     const [selected, setSelected] = useState<Order | null>(null);
@@ -430,6 +465,7 @@ export default function App() {
 
                         {screen === 'newOrder' && (
                             <NewOrder
+                                language={language}
                                 onBack={() => go('dashboard')}
                                 onSave={async input => {
                                     const o = await createOrder(input);
@@ -444,6 +480,7 @@ export default function App() {
 
                         {screen === 'receipt' && selected && (
                             <Receipt
+                                language={language}
                                 order={selected}
                                 onBack={() => go('dashboard')}
                             />
@@ -462,6 +499,7 @@ export default function App() {
 
                         {screen === 'delivery' && selected && (
                             <Delivery
+                                language={language}
                                 order={selected}
                                 onBack={() =>
                                     go('deliverSearch')
@@ -687,9 +725,11 @@ function today() {
   return `${day}-${month}-${year}`;
 }
 function NewOrder({
+    language,
     onBack,
     onSave
 }: {
+    language: Language;
     onBack: () => void;
     onSave: (o: any) => void;
 }) {
@@ -913,7 +953,7 @@ function NewOrder({
                                 className="trow"
                                 key={i.id}
                             >
-                                <span>{i.name}</span>
+                                <span>{translateClothingName(i.name, language)}</span>
 
                                 <span>
                                     {money(i.rate)}
@@ -992,9 +1032,11 @@ function NewOrder({
    ========================================================= */
 
 function Receipt({
+    language,
     order,
     onBack
 }: {
+    language: Language;
     order: Order;
     onBack: () => void;
 }) {
@@ -1058,7 +1100,7 @@ function Receipt({
                     <tbody>
                         {order.items.map(i => (
                             <tr key={i.name}>
-                                <td>{i.name}</td>
+                                <td>{translateClothingName(i.name, language)}</td>
                                 <td>{i.qty}</td>
                                 <td>
                                     {money(i.rate)}
@@ -1349,10 +1391,12 @@ function OrderTable({
    ========================================================= */
 
 function Delivery({
+    language,
     order,
     onBack,
     onDeliver
 }: {
+    language: Language;
     order: Order;
     onBack: () => void;
     onDeliver: (
@@ -1409,7 +1453,7 @@ function Delivery({
                         <tbody>
                             {order.items.map(i => (
                                 <tr key={i.name}>
-                                    <td>{i.name}</td>
+                                    <td>{translateClothingName(i.name, language)}</td>
                                     <td>{i.qty}</td>
                                     <td>
                                         {money(
@@ -1871,7 +1915,7 @@ function Reports({language}:{language:Language}) {
 
                         {item.map(i => (
                             <tr key={i.name}>
-                                <td>{i.name}</td>
+                                <td>{translateClothingName(i.name, language)}</td>
                                 <td>{i.qty}</td>
                                 <td>
                                     {money(i.amount)}
@@ -2009,7 +2053,7 @@ function Settings({ language, onLanguageChange }: { language: Language; onLangua
                         key={i.id}
                     >
 
-                        <span>{i.name}</span>
+                        <span>{translateClothingName(i.name, language)}</span>
 
                         <input
                             type="number"
